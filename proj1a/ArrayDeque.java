@@ -20,16 +20,16 @@ public class ArrayDeque<T> {
         return (size == 0 ? true : false);
     }
 
-    public int minusOne(int index) {
+    private int minusOne(int index) {
         return Math.floorMod(index-1, items.length);
     }
 
 
-    public int plusOne(int index) {
+    private int plusOne(int index) {
         return Math.floorMod(index+1, items.length);
     }
 
-    public int plusOne(int index, int length) {
+    private int plusOne(int index, int length) {
         return Math.floorMod(index+1, length);
     }
 
@@ -86,7 +86,7 @@ public class ArrayDeque<T> {
         size++;
     }
 
-    public T getFirst() {
+    private T getFirst() {
         return items[plusOne(nextFirst)];
     }
 
@@ -106,7 +106,7 @@ public class ArrayDeque<T> {
         size++;
     }
 
-    public T getLast() {
+    private T getLast() {
         return items[minusOne(nextLast)];
     }
 

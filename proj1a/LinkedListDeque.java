@@ -24,13 +24,6 @@ public class LinkedListDeque<T> {
         sentBack.next = sentBack;
         size = 0;
     }
-    public LinkedListDeque(T item) {
-        sentFront = new TNode((T)"null", null, null);
-        sentBack = new TNode((T)"null", null, null);
-        sentFront.next = new TNode(item, sentFront, sentBack);
-        sentBack.prev = sentFront.next;
-        size = 1;
-    }
 
     /**T在双端队列的前面添加一个类型的项目。*/
     public void addFirst(T item){
@@ -104,12 +97,8 @@ public class LinkedListDeque<T> {
         return null;
     }
 
-    public int getSize() {
-        return size;
-    }
-
     /**功能与get相同，但使用递归*/
-    public T getRecursiveHelper(int index, int count, TNode ptr) {
+    private T getRecursiveHelper(int index, int count, TNode ptr) {
         if(index == count) {
             return ptr.item;
         }
