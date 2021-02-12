@@ -1,116 +1,142 @@
+/**
+ * Linked-list based double ended queue, which accepts generic types.
+ * @Rule: All the method should follow "Deque API" described in
+ *  https://sp18.datastructur.es/materials/proj/proj1a/proj1a#the-deque-api
+ * @Rule: The amount of memory that this program uses at any given time must be
+ *  proportional to the number of items.
+ */
 public class LinkedListDeque<T> {
-    private class TNode {
-        public T item;
-        public TNode prev;
-        public TNode next;
 
-        public TNode(T i, TNode pre, TNode nex) {
+    private class Node {
+        T item;
+        Node prev;
+        Node next;
+
+        Node(T i, Node p, Node n) {
             item = i;
-            prev = pre;
-            next = nex;
+            prev = p;
+            next = n;
         }
     }
-    private TNode sentFront;
-    private TNode sentBack;
+
+    private Node sentinel; // This is circular sentinel !!
     private int size;
 
-    /**构造函数*/
-    public LinkedListDeque(){
-        sentFront = new TNode((T)"null", null, null);
-        sentBack = new TNode((T)"null", null, null);
-        sentFront.prev = sentFront;
-        sentFront.next = sentFront;
-        sentBack.prev = sentBack;
-        sentBack.next = sentBack;
+    /** Creates an empty linked list deque */
+    public LinkedListDeque() {
+        sentinel = new Node(null, null, null);
+        sentinel.prev = sentinel;
+        sentinel.next = sentinel;
         size = 0;
     }
 
-    /**T在双端队列的前面添加一个类型的项目。*/
-    public void addFirst(T item){
-        TNode tmp = sentFront.next;
-        sentFront.next = new TNode(item, sentFront, tmp);
-        tmp.prev = sentFront.next;
-        size++;
+    /** Returns true if deque is empty, false otherwise */
+    public boolean isEmpty() {
+        if (sentinel.next == sentinel && sentinel.prev == sentinel && size == 0) {
+            return true;
+        }
+        return false;
     }
 
-    /**T在双端队列的后面添加一个类型的项目。*/
-    public void addLast(T item){
-        TNode tmp = sentBack.prev;
-        sentBack.prev = new TNode(item, tmp, sentBack);
-        tmp.next = sentBack.prev;
-        size++;
-    }
-
-    /**如果双端队列为空，则返回true，否则返回false。*/
-    public boolean isEmpty(){
-        return size==0?true:false;
-    }
-
-    /**返回双端队列中的项目数。*/
-    public int size(){
+    /** Returns the number of items in the deque */
+    public int size() {
         return size;
     }
 
-    /**从头到尾打印双端队列中的项目，以空格隔开。*/
-    public void printDeque(){
-        TNode ptr = sentFront.next;
-        int count = size;
-        while(size>0) {
-            System.out.print(ptr.item + " ");
-            ptr = ptr.next;
-            size--;
+    /** Prints the items in the deque from first to last, separated by a space */
+    public void printDeque() {
+        Node currentNode = sentinel;
+        while (currentNode.next != sentinel) {
+            System.out.print(currentNode.next.item + " ");
+            currentNode = currentNode.next;
         }
         System.out.println();
     }
 
-    /**删除并返回双端队列的前面的项目。如果不存在此类项目，则返回null。*/
-    public T removeFirst(){
-        if(size != 0) {
-            sentFront.next.next.prev = sentFront;
-            sentFront.next = sentFront.next.next;
-            return sentFront.next.item;
-        }
-        return null;
+    /** Adds an item of type T to the front of the deque.
+     * @Rule: A single operation should be executed in constant time.
+     * */
+    public void addFirst(T item) {
+        sentinel.next = new Node(item, sentinel, sentinel.next);
+        sentinel.next.next.prev = sentinel.next;
+        size += 1;
     }
 
-    /**删除并返回双端队列的后面的项目。如果不存在此类项目，则返回null。*/
-    public T removeLast(){
-        if(size != 0) {
-            sentBack.prev = sentBack.prev.prev;
-            sentBack.prev.next = sentBack;
-            return sentBack.prev.item;
-        }
-        return null;
+    /** Adds an item of type T to the back of the deque
+     * @Rule: A single operation should be executed in constant time.
+     * */
+    public void addLast(T item) {
+        sentinel.prev = new Node(item, sentinel.prev, sentinel);
+        sentinel.prev.prev.next = sentinel.prev;
+        size += 1;
     }
 
-    /**返回*/
-    public T get(int index){
-        int count = 0;
-        TNode ptr = sentFront;
-        while(ptr.next != sentBack) {
-            ptr = ptr.next;
-            if(count == index) {
-                return ptr.item;
-            }
-            count++;
-        }
-        return null;
-    }
-
-    /**功能与get相同，但使用递归*/
-    private T getRecursiveHelper(int index, int count, TNode ptr) {
-        if(index == count) {
-            return ptr.item;
-        }
-        return getRecursiveHelper(index, count+1, ptr.next);
-    }
-
-    public T getRecursive(int index){
-        if (index >= size || index < 0) {
+    /** Removes and returns the item at the front of the deque. If no such item exists, returns null
+     * @Rule: A single operation should be executed in constant time.
+     */
+    public T removeFirst() {
+        if (sentinel.next == sentinel) {
             return null;
         }
-        int count = 0;
-        TNode ptr = sentFront.next;
-        return getRecursiveHelper(index, count, ptr);
+
+        T removed = sentinel.next.item;
+        sentinel.next = sentinel.next.next;
+        sentinel.next.prev = sentinel;
+        size -= 1;
+        return removed;
+    }
+
+    /** Removes and returns the item at the back of the deque. If no such item exists, returns null
+     * @Rule: A single operation should be executed in constant time.
+     */
+    public T removeLast() {
+        if (sentinel.prev == sentinel) {
+            return null;
+        }
+
+        T removed = sentinel.prev.item;
+        sentinel.prev = sentinel.prev.prev;
+        sentinel.prev.next = sentinel;
+        size -= 1;
+        return removed;
+    }
+
+    /** Gets the item at the given index, where 0 is the front, 1 is the next item,
+     * and so forth. If no such items exists, returns null.
+     * @Rule: not alter the deque !
+     * @Rule: Must use iteration !
+     */
+    public T get(int index) {
+        if (index >= size) {
+            return null;
+        }
+
+        Node currentNode = sentinel.next;
+        while (index != 0) {
+            currentNode = currentNode.next;
+            index -= 1;
+        }
+        return currentNode.item;
+    }
+
+    /** Helper method for getRecursive */
+    private T getRecursiveHelper(Node currentNode, int index) {
+        if (index == 0) {
+            return currentNode.item;
+        }
+
+        return getRecursiveHelper(currentNode.next, index - 1);
+    }
+    /** Gets the item at the given index, where 0 is the front, 1 is the next item,
+     * and so forth. If no such items exists, returns null.
+     * @Rule: not alter the deque !
+     * @Rule: Must use recursion !
+     */
+    public T getRecursive(int index) {
+        if (index >= size) {
+            return null;
+        }
+
+        return getRecursiveHelper(sentinel.next, index);
     }
 }
